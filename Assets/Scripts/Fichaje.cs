@@ -24,8 +24,8 @@ public class Fichaje : MonoBehaviour {
 
     private void ReiniciarValores(){
         codigoIF.text = null;
-        nombreProductoTxt.text = "NOMBRE DEL PRODUCTO";
-        precioUnitarioTxt.text = "P.U.";
+        nombreProductoTxt.text = "...";
+        precioUnitarioTxt.text = "...";
         cantidadIF.text = "0";
         subtotalTxt.text = "0";
         cantidadIF.interactable = false;
@@ -48,6 +48,8 @@ public class Fichaje : MonoBehaviour {
 
             cantidadIF.interactable = (codigoIF.text.Length > 0 && nombreProductoTxt.text.Length > 0 && nombreProductoTxt.text != null);
             cantidadIF.text = "1";
+
+            CalcularSubtotal();
 
         }else{
             ReiniciarValores();
