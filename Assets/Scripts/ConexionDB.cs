@@ -8,28 +8,23 @@ using UnityEngine;
 
 public class ConexionDB : MonoBehaviour {
 
-    private void Start(){
-        AbrirDB();
-        VerMercaderia();
-    }
+    #region Conexion
 
-    #region ConexionDB
+    public string rutaDB;
+    public string conexion;
+    public IDbConnection dbConnection;
+    public IDbCommand dbCommand;
+    public IDataReader dataReader;
+    public string nombreDB = "dbTienda.db";
 
-    string rutaDB;
-    string conexion;
-    IDbConnection dbConnection;
-    IDbCommand dbCommand;
-    IDataReader dataReader;
-    string nombreDB = "dbTienda.db";
-
-    private void AbrirDB(){
+    public void AbrirDB(){
         rutaDB = Application.dataPath + "/StreamingAssets/" + nombreDB;
         conexion = "URI=file:" + rutaDB;
         dbConnection = new SqliteConnection(conexion);
         dbConnection.Open();
     }
 
-    private void CerrarDB(){
+    public void CerrarDB(){
         dataReader.Close();
         dataReader = null;
         dbCommand.Dispose();
@@ -37,18 +32,6 @@ public class ConexionDB : MonoBehaviour {
         dbConnection.Close();
         dbConnection = null;
     }
-    #endregion ConexionDB
-    
-
-    void VerMercaderia(){
-        dbCommand = dbConnection.CreateCommand();
-        string sqlQuery = "SELECT producto FROM Mercaderia WHERE codigo = 2";
-        dbCommand.CommandText = sqlQuery;
-        dataReader = dbCommand.ExecuteReader();
-
-        while(dataReader.Read()){
-            Debug.Log(dataReader.GetString(0));
-        }   
-    }
+    #endregion Conexion
 
 }
