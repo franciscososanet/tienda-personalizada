@@ -17,17 +17,20 @@ public class Fichaje : MonoBehaviour {
     public Text subtotalTxt;
     public Button ficharBtn;
 
+    public GameObject prefabArticuloFichado;
+    public GameObject bodyContainer;
+
     private void Start(){
-        ReiniciarValores();
+        ReiniciarValoresFichaje();
         DBScript.AbrirDB();
     }
 
-    private void ReiniciarValores(){
-        codigoIF.text = null;
+    private void ReiniciarValoresFichaje(){
+        codigoIF.text = "...";
         nombreProductoTxt.text = "...";
-        precioUnitarioTxt.text = "...";
+        precioUnitarioTxt.text = "0.00";
         cantidadIF.text = "0";
-        subtotalTxt.text = "0";
+        subtotalTxt.text = "0.00";
         cantidadIF.interactable = false;
         ficharBtn.interactable = false;
     }
@@ -52,7 +55,7 @@ public class Fichaje : MonoBehaviour {
             CalcularSubtotal();
 
         }else{
-            ReiniciarValores();
+            ReiniciarValoresFichaje();
         }
     }
 
@@ -68,4 +71,17 @@ public class Fichaje : MonoBehaviour {
         ficharBtn.interactable = (codigoIF.text.Length > 0 && nombreProductoTxt.text.Length > 0 && cantidadIF.text.Length > 0 && subtotalTxt.text.Length > 0);
     }
 
+    public void FicharArticulo(){
+
+        GameObject prefab = Instantiate(prefabArticuloFichado);
+        prefab.transform.SetParent(bodyContainer.gameObject.transform, false);
+
+        string codigoArt = prefab.transform.GetChild(0).gameObject.GetComponent<Text>().text = codigoIF.text;
+        string nombreArt = prefab.transform.GetChild(1).gameObject.GetComponent<Text>().text = nombreProductoTxt.text;
+        string puArt = prefab.transform.GetChild(2).gameObject.GetComponent<Text>().text = precioUnitarioTxt.text;
+        string cantidadArt = prefab.transform.GetChild(3).gameObject.GetComponent<Text>().text = cantidadIF.text;
+        string subtotalArt = prefab.transform.GetChild(4).gameObject.GetComponent<Text>().text = subtotalTxt.text;
+
+        ReiniciarValoresFichaje();
+    }
 }
