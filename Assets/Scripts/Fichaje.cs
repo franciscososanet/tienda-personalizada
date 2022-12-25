@@ -83,5 +83,30 @@ public class Fichaje : MonoBehaviour {
         string subtotalArt = prefab.transform.GetChild(4).gameObject.GetComponent<Text>().text = subtotalTxt.text;
 
         ReiniciarValoresFichaje();
+        ActualizarCalculos();
     }
+
+    #region CalculosLateral
+
+    public GameObject[] valoresCalculosLateral;
+
+    private void ActualizarCalculos(){
+
+        int unidades = 0;
+        double subtotal = 0;
+        //double descuento = 0;
+        double total = 0;
+
+        foreach(Transform t in bodyContainer.transform){
+            unidades += Int32.Parse(t.GetChild(3).GetComponent<Text>().text); 
+            subtotal += double.Parse(t.GetChild(4).GetComponent<Text>().text); 
+            total += double.Parse(t.GetChild(4).GetComponent<Text>().text); 
+        }
+
+        valoresCalculosLateral[0].GetComponent<Text>().text = unidades.ToString();
+        valoresCalculosLateral[1].GetComponent<Text>().text = subtotal.ToString("0.00");
+        valoresCalculosLateral[3].GetComponent<Text>().text = total.ToString("0.00");
+    }
+
+    #endregion
 }
