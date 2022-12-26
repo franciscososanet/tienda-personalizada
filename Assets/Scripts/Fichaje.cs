@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class Fichaje : MonoBehaviour {
 
+    #region Inicializacion
+
     //Scripts
     public ConexionDB DBScript;
 
@@ -20,10 +22,18 @@ public class Fichaje : MonoBehaviour {
     public GameObject prefabArticuloFichado;
     public GameObject bodyContainer;
 
+    private void Update(){
+        ActualizarCalculos();    
+    }
+
     private void Start(){
         ReiniciarValoresFichaje();
         DBScript.AbrirDB();
     }
+
+    #endregion Inicializacion
+
+    #region Fichaje
 
     private void ReiniciarValoresFichaje(){
         codigoIF.text = "...";
@@ -82,19 +92,45 @@ public class Fichaje : MonoBehaviour {
         string cantidadArt = prefab.transform.GetChild(3).gameObject.GetComponent<Text>().text = cantidadIF.text;
         string subtotalArt = prefab.transform.GetChild(4).gameObject.GetComponent<Text>().text = subtotalTxt.text;
 
+        prefab.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(delegate{AbrirPanelOpciones(prefab.gameObject);});
+
         ReiniciarValoresFichaje();
         ActualizarCalculos();
     }
+
+    #endregion Fichaje
+
+    #region PanelOpciones
+
+    public GameObject panelOpcionesArtFichado;
+
+    private void AbrirPanelOpciones(GameObject g){
+        if(panelOpcionesArtFichado.activeSelf == false){ panelOpcionesArtFichado.SetActive(true); }
+
+        panelOpcionesArtFichado.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate{EliminarArticulo(g.gameObject); });
+    }
+
+    public void CerrarPanelOpciones(){
+        if(panelOpcionesArtFichado.activeSelf){ panelOpcionesArtFichado.SetActive(false); }
+    }
+
+    private void EliminarArticulo(GameObject g){
+
+        Destroy(g.gameObject);
+        CerrarPanelOpciones();
+        //ActualizarCalculos();  Actualmente la funcion esta siendo llamada desde el update: a corregir a futuro.
+    }
+
+    #endregion PanelOpciones
 
     #region CalculosLateral
 
     public GameObject[] valoresCalculosLateral;
 
-    private void ActualizarCalculos(){
+    public void ActualizarCalculos(){
 
         int unidades = 0;
         double subtotal = 0;
-        //double descuento = 0;
         double total = 0;
 
         foreach(Transform t in bodyContainer.transform){
@@ -108,5 +144,5 @@ public class Fichaje : MonoBehaviour {
         valoresCalculosLateral[3].GetComponent<Text>().text = total.ToString("0.00");
     }
 
-    #endregion
+    #endregion CalculosLateral
 }
