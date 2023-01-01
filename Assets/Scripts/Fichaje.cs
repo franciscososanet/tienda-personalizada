@@ -104,21 +104,66 @@ public class Fichaje : MonoBehaviour {
 
     public GameObject panelOpcionesArtFichado;
 
+
+
     private void AbrirPanelOpciones(GameObject g){
-        if(panelOpcionesArtFichado.activeSelf == false){ panelOpcionesArtFichado.SetActive(true); }
+        if(panelOpcionesArtFichado.activeSelf == false){ 
+            panelOpcionesArtFichado.SetActive(true); 
 
-        panelOpcionesArtFichado.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate{EliminarArticulo(g.gameObject); });
+
+            panelOpcionesArtFichado.transform.GetChild(1).GetComponent<Button>().onClick.RemoveAllListeners();
+            panelOpcionesArtFichado.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(delegate{MostrarPanelEditarCantidad(g);});
+
+            panelOpcionesArtFichado.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+            panelOpcionesArtFichado.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(delegate{EliminarArticulo(g.gameObject); });
+
+        }
     }
 
-    public void CerrarPanelOpciones(){
-        if(panelOpcionesArtFichado.activeSelf){ panelOpcionesArtFichado.SetActive(false); }
+    public void CerrarPanel(GameObject panelGO = null){
+        if(panelGO.activeSelf){ 
+            panelGO.SetActive(false);
+        }
     }
+
+    #region Opción: Editar Cantidad
+
+    public GameObject panelEditarCantidad;
+    public Text descripcionEditarCantidadTxt;
+    public InputField nuevaCantidadIF;
+    public Button editarCantidadBtn;
+
+    private void MostrarPanelEditarCantidad(GameObject fichadoGO = null){
+
+        int cantidadActual = 0;
+        string nombreArticulo = "";
+        nuevaCantidadIF.text = "0";
+
+        nombreArticulo = fichadoGO.transform.GetChild(1).GetComponent<Text>().text;
+        cantidadActual = Int32.Parse(fichadoGO.transform.GetChild(3).GetComponent<Text>().text);
+
+        descripcionEditarCantidadTxt.text = "La cantidad actual del producto " + nombreArticulo + " es de " + cantidadActual + " unidades.";
+
+        editarCantidadBtn.GetComponent<Button>().onClick.RemoveAllListeners();
+        editarCantidadBtn.GetComponent<Button>().onClick.AddListener(delegate{EditarCantidad(fichadoGO, nuevaCantidadIF.text); });
+
+        CerrarPanel(panelOpcionesArtFichado);
+        panelEditarCantidad.SetActive(true);
+    }
+
+    private void EditarCantidad(GameObject fichadoGO, string nuevaCantidad){
+
+        fichadoGO.transform.GetChild(3).GetComponent<Text>().text = nuevaCantidad;
+        CerrarPanel(panelEditarCantidad);
+    }
+
+    #endregion Opción: Editar Cantidad
 
     private void EliminarArticulo(GameObject g){
 
         Destroy(g.gameObject);
-        CerrarPanelOpciones();
-        //ActualizarCalculos();  Actualmente la funcion esta siendo llamada desde el update: a corregir a futuro.
+        CerrarPanel(panelOpcionesArtFichado);
+        // ActualizarCalculos();  //Actualmente la funcion esta siendo llamada desde el update: a corregir a futuro.
     }
 
     #endregion PanelOpciones

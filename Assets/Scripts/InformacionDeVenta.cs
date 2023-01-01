@@ -14,6 +14,8 @@ public class InformacionDeVenta : MonoBehaviour {
         InvocarMDPago();
     }
 
+    #region InformacionVenta
+
     public Dropdown vendedoresDropdown; 
     public Dropdown mdPagoDropdown;
     public Dropdown cuotasDropdown;
@@ -63,5 +65,42 @@ public class InformacionDeVenta : MonoBehaviour {
             cuotasDropdown.value = 0;
         }
     }
+
+    #endregion InformacionVenta
+
+    #region ConfirmarVenta
+
+    public Text unidadesTxt;
+    public Text subtotalTxt;
+    public Text descuentoTxt;
+    public Text totalTxt;
+    public InputField observacionesIF;
+
+    public void ConfirmarVenta(){
+
+        string unidades = unidadesTxt.text;
+        string subtotal = subtotalTxt.text;
+        string descuento = descuentoTxt.text;
+        string total = totalTxt.text;
+        string vendedor = vendedoresDropdown.options[vendedoresDropdown.value].text;
+        string medioDePago = mdPagoDropdown.options[mdPagoDropdown.value].text;
+        string cuotas = cuotasDropdown.options[cuotasDropdown.value].text;
+        string observaciones = observacionesIF.text;
+        string fecha = System.DateTime.Now.ToString("dd/MM/yyyy - hh:mm:ss tt");
+        //string nombreDeCaja = ;
+
+
+        //OBTENER TODOS LOS FICHADOS, ENLISTARLOS (O VER LA MANERA DE HACERLO), Y PASARLOS A LA CAJA ACTUAL ETC. => REVISAR COMO HICE EN EL PROYECTO DE TIENDA PASADO
+        //CONEXION A DB: EN LA CAJA ACTUAL, PONER TODOS ESTOS DATOS, RESTARLOS DE LA DB DE MERCADERIA (AL STOCK), SUMARLO A LA VENTA HISTORICA DEL VENDEDOR...
+
+        //SI TODO SALIO CORRECTAMENTE, RECARGAR LA ESCENA ACTUAL (O REINICIAR TODOS LOS VALORES, VER QUE ES MAS FACIL)
+        //SI ALGO FALLO, CREAR UN MENSAJE DE ALERTA/ERROR
+        
+    }
+
+    #endregion ConfirmarVenta
+
+
+    
 
 }
