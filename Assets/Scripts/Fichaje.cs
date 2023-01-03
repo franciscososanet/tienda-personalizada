@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -104,18 +102,21 @@ public class Fichaje : MonoBehaviour {
 
     public GameObject panelOpcionesArtFichado;
 
-
-
     private void AbrirPanelOpciones(GameObject g){
         if(panelOpcionesArtFichado.activeSelf == false){ 
             panelOpcionesArtFichado.SetActive(true); 
 
+            panelOpcionesArtFichado.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            panelOpcionesArtFichado.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(delegate{CerrarPanel(panelOpcionesArtFichado);});
 
             panelOpcionesArtFichado.transform.GetChild(1).GetComponent<Button>().onClick.RemoveAllListeners();
             panelOpcionesArtFichado.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(delegate{MostrarPanelEditarCantidad(g);});
 
+            panelOpcionesArtFichado.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners();
+            panelOpcionesArtFichado.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate{MostrarPanelEditarSubtotal(g.gameObject); });
+
             panelOpcionesArtFichado.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
-            panelOpcionesArtFichado.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(delegate{EliminarArticulo(g.gameObject); });
+            panelOpcionesArtFichado.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(delegate{EliminarArticulo(g.gameObject); });   
 
         }
     }
@@ -126,26 +127,29 @@ public class Fichaje : MonoBehaviour {
         }
     }
 
-    #region Opción: Editar Cantidad
+    #region Opción: Editar Cantidad`
 
     public GameObject panelEditarCantidad;
     public Text descripcionEditarCantidadTxt;
     public InputField nuevaCantidadIF;
     public Button editarCantidadBtn;
+    public Button cerrarPanelEditarCantidadBtn;
 
     private void MostrarPanelEditarCantidad(GameObject fichadoGO = null){
 
-        int cantidadActual = 0;
+        cerrarPanelEditarCantidadBtn.onClick.RemoveAllListeners();
+        cerrarPanelEditarCantidadBtn.onClick.AddListener(delegate{CerrarPanel(panelEditarCantidad); });
+
         string nombreArticulo = "";
         nuevaCantidadIF.text = "0";
 
         nombreArticulo = fichadoGO.transform.GetChild(1).GetComponent<Text>().text;
-        cantidadActual = Int32.Parse(fichadoGO.transform.GetChild(3).GetComponent<Text>().text);
+        int cantidadActual = Int32.Parse(fichadoGO.transform.GetChild(3).GetComponent<Text>().text);
 
         descripcionEditarCantidadTxt.text = "La cantidad actual del producto " + nombreArticulo + " es de " + cantidadActual + " unidades.";
 
-        editarCantidadBtn.GetComponent<Button>().onClick.RemoveAllListeners();
-        editarCantidadBtn.GetComponent<Button>().onClick.AddListener(delegate{EditarCantidad(fichadoGO, nuevaCantidadIF.text); });
+        editarCantidadBtn.onClick.RemoveAllListeners();
+        editarCantidadBtn.onClick.AddListener(delegate{EditarCantidad(fichadoGO, nuevaCantidadIF.text); });
 
         CerrarPanel(panelOpcionesArtFichado);
         panelEditarCantidad.SetActive(true);
@@ -154,11 +158,50 @@ public class Fichaje : MonoBehaviour {
     private void EditarCantidad(GameObject fichadoGO, string nuevaCantidad){
 
         fichadoGO.transform.GetChild(3).GetComponent<Text>().text = nuevaCantidad;
+        fichadoGO.transform.GetChild(4).GetComponent<Text>().text = (float.Parse(nuevaCantidad) * float.Parse(fichadoGO.transform.GetChild(4).GetComponent<Text>().text)).ToString("0.00"); //Multiplicar subtotal con la nueva cantidad
+
         CerrarPanel(panelEditarCantidad);
     }
 
     #endregion Opción: Editar Cantidad
 
+    #region Opción: Editar Subtotal
+
+        public GameObject panelEditarSubtotal;
+        public Text descripcionEditarSubtotalTxt;
+        public InputField nuevoSubtotalIF;
+        public Button editarSubtotalBtn;
+        public Button cerrarPanelEditarSubtotalBtn;
+
+        private void MostrarPanelEditarSubtotal(GameObject fichadoGO = null){
+
+            cerrarPanelEditarSubtotalBtn.onClick.RemoveAllListeners();
+            cerrarPanelEditarSubtotalBtn.onClick.AddListener(delegate{CerrarPanel(panelEditarSubtotal); });
+
+            string nombreArticulo = "";
+            nuevoSubtotalIF.text = "0";
+
+            nombreArticulo = fichadoGO.transform.GetChild(1).GetComponent<Text>().text;
+            float subtotalActual = float.Parse(fichadoGO.transform.GetChild(4).GetComponent<Text>().text);
+
+            descripcionEditarSubtotalTxt.text = "El subtotal actual del producto " + nombreArticulo + " es de $" + subtotalActual + ".";
+
+            editarSubtotalBtn.onClick.RemoveAllListeners();
+            editarSubtotalBtn.onClick.AddListener(delegate{EditarSubtotal(fichadoGO, nuevoSubtotalIF.text); });
+
+            CerrarPanel(panelOpcionesArtFichado);
+            panelEditarSubtotal.SetActive(true);
+        }
+
+        private void EditarSubtotal(GameObject fichadoGO, string nuevoSubtotal){
+
+            fichadoGO.transform.GetChild(4).GetComponent<Text>().text = float.Parse(nuevoSubtotal).ToString("0.00"); //Reformateo para poner 2 decimales
+            CerrarPanel(panelEditarSubtotal);
+        }
+
+    #endregion Opción: Editar Subtotal
+
+    #region Opción: Eliminar Artículo
     private void EliminarArticulo(GameObject g){
 
         Destroy(g.gameObject);
@@ -166,6 +209,7 @@ public class Fichaje : MonoBehaviour {
         // ActualizarCalculos();  //Actualmente la funcion esta siendo llamada desde el update: a corregir a futuro.
     }
 
+    #endregion Opción: Eliminar Articulo
     #endregion PanelOpciones
 
     #region CalculosLateral
@@ -176,16 +220,19 @@ public class Fichaje : MonoBehaviour {
 
         int unidades = 0;
         double subtotal = 0;
+        double descuento = 0;
         double total = 0;
 
         foreach(Transform t in bodyContainer.transform){
             unidades += Int32.Parse(t.GetChild(3).GetComponent<Text>().text); 
             subtotal += double.Parse(t.GetChild(4).GetComponent<Text>().text); 
+            descuento += double.Parse(t.GetChild(6).GetComponent<Text>().text);
             total += double.Parse(t.GetChild(4).GetComponent<Text>().text); 
         }
 
         valoresCalculosLateral[0].GetComponent<Text>().text = unidades.ToString();
         valoresCalculosLateral[1].GetComponent<Text>().text = subtotal.ToString("0.00");
+        valoresCalculosLateral[2].GetComponent<Text>().text = descuento.ToString("0.00");
         valoresCalculosLateral[3].GetComponent<Text>().text = total.ToString("0.00");
     }
 
