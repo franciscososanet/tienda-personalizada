@@ -212,6 +212,70 @@ public class Fichaje : MonoBehaviour {
     #endregion Opción: Eliminar Articulo
     #endregion PanelOpciones
 
+    #region DescuentoGlobal
+
+    public GameObject panelDescuentoGlobal;
+    public Text descripcionDescuentoGlobalTxt;
+    public InputField descuentoNumeroIF;
+    public InputField descuentoPorcentualIF;
+    public Button aplicarDescuentoBtn;
+
+    public Text descuentoPesoTxt;
+    public Text descuentoPorcentualTxt;
+
+    public void MostrarPanelDescuentoGlobal(){
+
+        descuentoNumeroIF.text = "0";
+        descuentoPorcentualIF.text = "0";
+
+        string subtotalActual = valoresCalculosLateral[1].GetComponent<Text>().text;
+        descripcionDescuentoGlobalTxt.text = "El subtotal actual de la compra es de $" + subtotalActual;
+
+        panelDescuentoGlobal.SetActive(true);
+    }
+
+    public void CalcularDescuento(){
+
+        double subtotalActual = double.Parse(valoresCalculosLateral[1].GetComponent<Text>().text);
+
+        double descuentoPesos = 0;
+        double subtotalConDescuentoPesos = 0;
+        double descuentoPorcentual = 0;
+        double subtotalConDescuentoPorcentual = 0;
+        double descuentoTotal = 0;
+
+        descuentoPesos = double.Parse(descuentoNumeroIF.text);
+        subtotalConDescuentoPesos = subtotalActual - descuentoPesos;
+        descuentoPesoTxt.text = subtotalConDescuentoPesos.ToString("0.00");
+
+
+        descuentoPorcentual = subtotalConDescuentoPesos - (subtotalConDescuentoPesos * double.Parse(descuentoPorcentualIF.text)) / 100;
+        descuentoPorcentualTxt.text = descuentoPorcentual.ToString("0.00");
+
+        subtotalConDescuentoPorcentual = subtotalConDescuentoPesos - descuentoPorcentual;
+
+        descuentoTotal = subtotalActual - descuentoPorcentual;
+
+        aplicarDescuentoBtn.onClick.RemoveAllListeners();
+        aplicarDescuentoBtn.onClick.AddListener(delegate{AplicarDescuento(descuentoTotal); });
+
+        Debug.Log("descuento Pesos: " + descuentoPesos);
+        Debug.Log("descuento Porcentual: " + descuentoPorcentual);
+        Debug.Log("descuento Total: " + descuentoTotal); //Algo de todo esto esta mal. Se est apasando como descuento lo que es el subtotal. En descuento va el descuento restado al subtotal
+
+    }
+
+    private void AplicarDescuento(double descuentoAAplicar){
+
+        Debug.Log(descuentoAAplicar);
+
+        valoresCalculosLateral[2].GetComponent<Text>().text = "0.00"; //Reinicio el descuento, por si se quiere aplicar otro descuento, que no tome en cuenta al anterior.
+        valoresCalculosLateral[2].GetComponent<Text>().text = (double.Parse(valoresCalculosLateral[2].GetComponent<Text>().text) + descuentoAAplicar).ToString("0.00");
+        CerrarPanel(panelDescuentoGlobal);
+    }
+
+    #endregion Descuento Global
+
     #region CalculosLateral
 
     public GameObject[] valoresCalculosLateral;
@@ -220,20 +284,15 @@ public class Fichaje : MonoBehaviour {
 
         int unidades = 0;
         double subtotal = 0;
-        double descuento = 0;
-        double total = 0;
 
         foreach(Transform t in bodyContainer.transform){
             unidades += Int32.Parse(t.GetChild(3).GetComponent<Text>().text); 
             subtotal += double.Parse(t.GetChild(4).GetComponent<Text>().text); 
-            descuento += double.Parse(t.GetChild(6).GetComponent<Text>().text);
-            total += double.Parse(t.GetChild(4).GetComponent<Text>().text); 
         }
 
         valoresCalculosLateral[0].GetComponent<Text>().text = unidades.ToString();
         valoresCalculosLateral[1].GetComponent<Text>().text = subtotal.ToString("0.00");
-        valoresCalculosLateral[2].GetComponent<Text>().text = descuento.ToString("0.00");
-        valoresCalculosLateral[3].GetComponent<Text>().text = total.ToString("0.00");
+        valoresCalculosLateral[3].GetComponent<Text>().text = (subtotal - double.Parse(valoresCalculosLateral[2].GetComponent<Text>().text)).ToString("0.00"); //total = subtotal-descuento
     }
 
     #endregion CalculosLateral
