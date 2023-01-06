@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
@@ -8,6 +6,7 @@ public class MostrarMercaderia : MonoBehaviour {
 
     //Scripts
     public ConexionDB DBScript;  
+    public CambiarEscena CambiarEscenaScript;
 
     public GameObject mercaderiaContainer;
     public GameObject prefabMercaderia;
@@ -17,6 +16,7 @@ public class MostrarMercaderia : MonoBehaviour {
         InvocarMercaderia();
     }
 
+    public GameObject panelOpciones;
 
     private void InvocarMercaderia(){
 
@@ -38,12 +38,90 @@ public class MostrarMercaderia : MonoBehaviour {
             prefab.transform.GetChild(5).GetComponent<Text>().text = DBScript.dataReader.GetString(5); //UnidadesVendidas
             prefab.transform.GetChild(6).GetComponent<Text>().text = DBScript.dataReader.GetString(6); //FechaDeCreacion
             prefab.transform.GetChild(7).GetComponent<Text>().text = DBScript.dataReader.GetString(7); //Proveedor
-            prefab.transform.GetChild(8).GetComponent<Button>().onClick.AddListener(delegate{FuncionRandom(prefab);});
+            prefab.transform.GetChild(8).GetComponent<Button>().onClick.AddListener(delegate{AbrirPanelOpciones(prefab);});
         }
     }
 
-    private void FuncionRandom(GameObject prefab){
-        Debug.Log(prefab.transform.GetChild(0).gameObject.name);
+    #region Opciones
+
+    public GameObject botonesContainer;
+    public GameObject panelEditarArticulo;
+
+    private void AbrirPanelOpciones(GameObject prefab){
+
+        foreach(Transform t in botonesContainer.transform){
+            t.GetComponent<Button>().onClick.RemoveAllListeners();
+            t.GetComponent<Button>().onClick.AddListener(delegate{MostrarPanelEditarArticulo(t.gameObject.name.ToLower(), prefab);});
+        }
+
+        panelOpciones.SetActive(true);
     }
+
+    public void CerrarPanelOpciones(){
+
+        panelOpciones.SetActive(false);
+    }
+
+    private void MostrarPanelEditarArticulo(string opcionNombre, GameObject prefab){
+
+        string codigo = prefab.transform.GetChild(0).GetComponent<Text>().text;
+        Text encabezadoTxt = panelEditarArticulo.transform.GetChild(1).GetComponent<Text>();
+        Text tituloTxt = panelEditarArticulo.transform.GetChild(2).GetComponent<Text>();
+        InputField valorAEditarIF = tituloTxt.transform.GetChild(0).GetComponent<InputField>();
+        Button confirmarEdicionBtn = panelEditarArticulo.transform.GetChild(3).GetComponent<Button>();
+
+        CerrarPanelOpciones();
+
+        panelEditarArticulo.transform.GetChild(0).GetComponent<Text>().text = "EDITAR " + opcionNombre.ToUpper(); //Titulo   
+
+        switch(opcionNombre){ //Encabezado y Titulo del IF
+            case "promocion":
+            encabezadoTxt.text = "Escribir debajo la nueva " + opcionNombre + " para el producto: " + prefab.transform.GetChild(1).GetComponent<Text>().text;
+            tituloTxt.text = "NUEVA " + opcionNombre.ToUpper();
+            break;
+
+            case "unidades vendidas":
+            encabezadoTxt.text = "Escribir debajo las nuevas " + opcionNombre + " para el producto: " + prefab.transform.GetChild(1).GetComponent<Text>().text;
+            tituloTxt.text = "NUEVAS " + opcionNombre.ToUpper();
+            break;
+
+            case "fecha de creacion":
+            encabezadoTxt.text = "Escribir debajo la nueva fecha de creación para el producto: " + prefab.transform.GetChild(1).GetComponent<Text>().text;    
+            tituloTxt.text = "NUEVA FECHA"; 
+            break;
+
+            default:
+            encabezadoTxt.text = "Escribir debajo el nuevo " + opcionNombre + " para el producto: " + prefab.transform.GetChild(1).GetComponent<Text>().text;     
+            tituloTxt.text = "NUEVO " + opcionNombre.ToUpper();
+            break;
+
+        }
+
+        confirmarEdicionBtn.onClick.RemoveAllListeners();
+        confirmarEdicionBtn.onClick.AddListener(delegate{AplicarEdicion(opcionNombre, valorAEditarIF.text, codigo);});
+
+        panelEditarArticulo.SetActive(true);
+    }
+
+    public void CerrarPanelEditarArticulo(){
+        
+        panelEditarArticulo.SetActive(false);
+
+        InputField valorAEditarIF = panelEditarArticulo.transform.GetChild(2).GetChild(0).GetComponent<InputField>();
+        valorAEditarIF.text = "";
+    }
+
+    private void AplicarEdicion(string columna, string valor, string codigo){
+
+        DBScript.dbCommand = DBScript.dbConnection.CreateCommand();
+        string sqlQuery = String.Format("UPDATE Mercaderia SET \"{0}\" = \"{1}\" WHERE codigo = \"{2}\"", columna, valor, codigo);
+        DBScript.dbCommand.CommandText = sqlQuery;
+        DBScript.dataReader = DBScript.dbCommand.ExecuteReader();
+
+        CambiarEscenaScript.CambiarEscenaA("Mercaderia");       
+      
+    }
+
+    #endregion Opciones
 
 }

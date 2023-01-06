@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
@@ -46,6 +44,8 @@ public class OpcionesGenerales : MonoBehaviour {
 
     private void MostrarPanelCrearProducto(){
 
+        CerrarPanelOpcionesGenerales();
+
         GameObject ifsContainer = codigoIF.transform.parent.parent.gameObject;
         
         panelCrearProducto.SetActive(true);
@@ -62,6 +62,14 @@ public class OpcionesGenerales : MonoBehaviour {
         string sqlQuery = String.Format("INSERT INTO Mercaderia (codigo, producto, preciounitario, promocion, stock, 'unidades vendidas', 'fecha de creacion', proveedor) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\")", codigoIF.text, nombreProductoIF.text, precioUnitarioIF.text, promocionIF.text, stockIF.text, unidadesVendidasIF.text, fechaCreacionIF.text, proveedorIF.text);  
         DBScript.dbCommand.CommandText = sqlQuery;
         DBScript.dataReader = DBScript.dbCommand.ExecuteReader();
+
+        panelCrearProducto.SetActive(false);
+
+        CambiarEscenaScript.CambiarEscenaA("Mercaderia");
+    }
+
+    public void CerrarPanelCrearProducto(){
+        panelCrearProducto.SetActive(false);
     }
 
     #endregion
