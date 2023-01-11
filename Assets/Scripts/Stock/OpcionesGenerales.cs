@@ -59,7 +59,7 @@ public class OpcionesGenerales : MonoBehaviour {
 
         DBScript.AbrirDB();
         DBScript.dbCommand = DBScript.dbConnection.CreateCommand();
-        string sqlQuery = String.Format("INSERT INTO Mercaderia (codigo, producto, preciounitario, promocion, stock, 'unidades vendidas', 'fecha de creacion', proveedor) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\")", codigoIF.text, nombreProductoIF.text, precioUnitarioIF.text, promocionIF.text, stockIF.text, unidadesVendidasIF.text, fechaCreacionIF.text, proveedorIF.text);  
+        string sqlQuery = String.Format("INSERT INTO Mercaderia (codigo, producto, 'precio unitario', promocion, stock, 'unidades vendidas', 'fecha de creacion', proveedor) VALUES (\"{0}\", \"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\")", codigoIF.text, nombreProductoIF.text, precioUnitarioIF.text, promocionIF.text, stockIF.text, unidadesVendidasIF.text, fechaCreacionIF.text, proveedorIF.text);  
         DBScript.dbCommand.CommandText = sqlQuery;
         DBScript.dataReader = DBScript.dbCommand.ExecuteReader();
 
