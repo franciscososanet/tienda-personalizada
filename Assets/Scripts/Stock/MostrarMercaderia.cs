@@ -52,6 +52,10 @@ public class MostrarMercaderia : MonoBehaviour {
         foreach(Transform t in botonesContainer.transform){
             t.GetComponent<Button>().onClick.RemoveAllListeners();
             t.GetComponent<Button>().onClick.AddListener(delegate{MostrarPanelEditarArticulo(t.gameObject.name.ToLower(), prefab);});
+
+            Button botonEliminarArt = botonesContainer.transform.GetChild(botonesContainer.transform.childCount - 2).GetComponent<Button>(); //Busco al anteultimo boton ("Eliminar producto")
+            botonEliminarArt.onClick.RemoveAllListeners();
+            botonEliminarArt.onClick.AddListener(delegate{AbrirPanelEliminarArticulo(prefab);});
         }
 
         panelOpciones.SetActive(true);
@@ -90,6 +94,11 @@ public class MostrarMercaderia : MonoBehaviour {
             tituloTxt.text = "NUEVA FECHA"; 
             break;
 
+            case "producto":
+            encabezadoTxt.text = encabezadoTxt.text = "Escribir debajo el nuevo nombre del producto: " + prefab.transform.GetChild(1).GetComponent<Text>().text;    
+            tituloTxt.text = "NUEVO NOMBRE";
+            break;
+
             default:
             encabezadoTxt.text = "Escribir debajo el nuevo " + opcionNombre + " para el producto: " + prefab.transform.GetChild(1).GetComponent<Text>().text;     
             tituloTxt.text = "NUEVO " + opcionNombre.ToUpper();
@@ -121,6 +130,50 @@ public class MostrarMercaderia : MonoBehaviour {
         CambiarEscenaScript.CambiarEscenaA("Mercaderia");       
       
     }
+
+    #region Eliminar Articulo
+
+    public GameObject panelEliminarArticulo;
+
+    public void AbrirPanelEliminarArticulo(GameObject prefab){
+
+        CerrarPanelOpciones();
+
+        string idArticulo = prefab.transform.GetChild(0).GetComponent<Text>().text;
+        string nombreArticulo = prefab.transform.GetChild(1).GetComponent<Text>().text;
+
+        Text tituloPanel = panelEliminarArticulo.transform.GetChild(1).GetComponent<Text>();
+        tituloPanel.text = "¿Eliminar permanentemente el artículo " + nombreArticulo;
+
+        Button cerrarPanel = panelEliminarArticulo.transform.GetChild(3).GetComponent<Button>();
+        cerrarPanel.onClick.RemoveAllListeners();
+        cerrarPanel.onClick.AddListener(CerrarPanelEliminarArticulo);
+
+        Button confirmarEliminacionBtn = panelEliminarArticulo.transform.GetChild(2).GetComponent<Button>();
+        confirmarEliminacionBtn.onClick.RemoveAllListeners();
+        confirmarEliminacionBtn.onClick.AddListener(delegate{ConfirmarEliminacionDeArticulo(idArticulo);});
+
+        panelEliminarArticulo.SetActive(true);
+
+    }
+
+    private void ConfirmarEliminacionDeArticulo(string idArticulo){
+
+        DBScript.dbCommand = DBScript.dbConnection.CreateCommand();
+        string sqlQuery = String.Format("DELETE FROM Mercaderia WHERE codigo = \"{0}\"", idArticulo);
+        DBScript.dbCommand.CommandText = sqlQuery;
+        DBScript.dataReader = DBScript.dbCommand.ExecuteReader();
+
+        CerrarPanelEliminarArticulo();
+
+        CambiarEscenaScript.CambiarEscenaA("Mercaderia");
+    }
+
+    private void CerrarPanelEliminarArticulo(){
+        panelEliminarArticulo.SetActive(false);
+    }
+
+    #endregion Eliminar Articulo
 
     #endregion Opciones
 
